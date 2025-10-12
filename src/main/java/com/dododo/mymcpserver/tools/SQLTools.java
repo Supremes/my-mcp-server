@@ -3,12 +3,16 @@ package com.dododo.mymcpserver.tools;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.*;
 
+@Service
 public class SQLTools {
     @Autowired
     private DataSource dataSource;
@@ -16,7 +20,7 @@ public class SQLTools {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Tool(name = "execute-sql", description = "支持CRUD各类操作")
-    public String executeSQL(String sql) {
+    public String executeSQL(@ToolParam(description = "待执行的完整SQL语句", required = true) String sql) {
         return "";
     }
 
