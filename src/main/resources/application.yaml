@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: my-mcp-server
+
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql:3306/dawn?serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    username: root
+    password: 123456
