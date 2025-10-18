@@ -12,6 +12,17 @@ spring:
     username: root
     password: 123456
 
+  mybatis-plus:
+    mapper-locations: classpath:mapper/*.xml
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+      map-underscore-to-camel-case: true
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
   ai:
     mcp:
       server:
@@ -20,8 +31,13 @@ spring:
         type: SYNC
         instructions: "This server provides sql information tools and resources"
         sse-message-endpoint: /mcp/messages
+        sse-endpoint: /sse
         capabilities:
           tool: true
           resource: true
           prompt: true
           completion: true
+
+logging:
+  level:
+    root: DEBUG

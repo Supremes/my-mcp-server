@@ -1,9 +1,13 @@
 package com.dododo.mymcpserver.tools;
 
+import com.dododo.mymcpserver.service.ConnectionPoolSQLService;
+import com.dododo.mymcpserver.service.JPASQLFacadeService;
+import com.dododo.mymcpserver.service.JPAService;
+import com.dododo.mymcpserver.service.MybatisSQLService;
+import com.dododo.mymcpserver.utils.SQLUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,22 +16,18 @@ import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 import java.sql.*;
 
+import static com.dododo.mymcpserver.constants.SQLConstants.INSERT;
+
 @Service
 public class SQLTools {
     @Autowired
-    private DataSource dataSource;
+    private ConnectionPoolSQLService connectionPoolSQLService;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private MybatisSQLService mybatisSQLService;
 
-    @Tool(name = "execute-sql", description = "支持CRUD各类操作")
-    public String executeSQL(@ToolParam(description = "待执行的完整SQL语句", required = true) String sql) {
-        return "";
-    }
-
-    @Tool(name = "list-tables", description = "支持罗列库中的表单")
-    public String listTables(String sql) {
-        return "";
-    }
+    @Autowired
+    private JPASQLFacadeService jpasqlFacadeService;
 
     /**
      * 执行任意SQL:
@@ -35,50 +35,19 @@ public class SQLTools {
      * - 其他: 返回 {"updated": 影响行数}
      * 安全提示: 外部输入请自行做白名单/参数化处理，避免 SQL 注入。
      */
-    @Tool(name = "run-sql", description = "执行任意SQL(SELECT返回结果集, 其他语句返回影响行数)")
-    public String runSql(String sql) {
-        if (sql == null || sql.isBlank()) {
-            return "{\"error\":\"SQL不能为空\"}";
-        }
-        String trimmed = sql.trim();
-        try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
-
-            // 简单判定是否为查询
-            if (trimmed.regionMatches(true, 0, "SELECT", 0, 6)) {
-                try (ResultSet rs = stmt.executeQuery(trimmed)) {
-                    ResultSetMetaData meta = rs.getMetaData();
-                    int cols = meta.getColumnCount();
-                    ArrayNode arr = mapper.createArrayNode();
-                    while (rs.next()) {
-                        ObjectNode row = mapper.createObjectNode();
-                        for (int i = 1; i <= cols; i++) {
-                            String colName = meta.getColumnLabel(i);
-                            Object val = rs.getObject(i);
-                            if (val == null) {
-                                row.putNull(colName);
-                            } else if (val instanceof Number) {
-                                row.putPOJO(colName, val);
-                            } else {
-                                row.put(colName, val.toString());
-                            }
-                        }
-                        arr.add(row);
-                    }
-                    return mapper.writeValueAsString(arr);
-                }
-            } else {
-                int affected = stmt.executeUpdate(trimmed);
-                ObjectNode result = mapper.createObjectNode();
-                result.put("updated", affected);
-                return mapper.writeValueAsString(result);
-            }
-        } catch (SQLException e) {
-            ObjectNode err = mapper.createObjectNode();
-            err.put("error", e.getMessage());
-            return err.toString();
-        } catch (Exception ex) {
-            return "{\"error\":\"执行异常: " + ex.getMessage() + "\"}";
-        }
+    @Tool(name = "run-sql-connection-pool", description = "执行任意SQL(SELECT返回结果集, 其他语句返回影响行数), 该实现基于底层连接池的datasource")
+    public String runSqlWithConnectionPool(String sql) {
+        return connectionPoolSQLService.executeSQL(sql);
     }
+
+    @Tool(name = "run-sql-mybatis-orm", description = "执行任意SQL(SELECT返回结果集, 其他语句返回影响行数), 该实现基于mybatis提供的SqlSessionTemplate")
+    public String runSqlWithMybatisOrm(String sql) {
+        return mybatisSQLService.executeSQL(sql);
+    }
+
+    @Tool(name = "run-sql-jpa", description = "执行任意SQL(SELECT返回结果集, 其他语句返回影响行数), 该实现基于JPA提供的entityManager")
+    public String runSqlWithJPA(String sql) {
+        return jpasqlFacadeService.executeSQL(sql);
+    }
+
 }
