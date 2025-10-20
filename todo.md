@@ -206,3 +206,6 @@ executeQuery（或 getResultList）是“读”，返回结构化结果；execut
 
 如果你后续想让我帮你改进语句类型的判定或增加安全过滤，直接告诉我即可，我可以继续为你实现。需要继续增强吗？
 ```
+
+- BeanFactoryPostProcessor : 在Spring容器实例化bean之前，读取和修改bean 的定义
+- 

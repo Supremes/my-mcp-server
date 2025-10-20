@@ -13,6 +13,11 @@ import java.sql.Statement;
 public class SQLUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    /*Statement autocommit 设置为true:
+      * 每一条语句都会被当作一个独立的事务来执行，因此
+      * 执行完 executeUpdate() 后，数据库会立即自动提交该更改。
+      * 因此，即使方法上没有 @Transactional，数据也已经持久化到数据库中，不会抛异常。
+     */
     public static String executeSQLWithStatement(String sql, Statement stmt) throws SQLException, JsonProcessingException {
         String trimmed = sql.trim();
         if (isQuerySQL(sql)) {

@@ -1,24 +1,16 @@
 package com.dododo.mymcpserver.tools;
 
+import com.dododo.mymcpserver.annotation.MCPTool;
 import com.dododo.mymcpserver.service.ConnectionPoolSQLService;
 import com.dododo.mymcpserver.service.JPASQLFacadeService;
-import com.dododo.mymcpserver.service.JPAService;
 import com.dododo.mymcpserver.service.MybatisSQLService;
-import com.dododo.mymcpserver.utils.SQLUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-import java.sql.*;
 
-import static com.dododo.mymcpserver.constants.SQLConstants.INSERT;
-
-@Service
+@MCPTool
+@Component
 public class SQLTools {
     @Autowired
     private ConnectionPoolSQLService connectionPoolSQLService;
