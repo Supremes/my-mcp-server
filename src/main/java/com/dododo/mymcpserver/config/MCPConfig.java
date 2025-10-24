@@ -1,5 +1,6 @@
 package com.dododo.mymcpserver.config;
 
+import com.dododo.mymcpserver.tools.CEMTools;
 import com.dododo.mymcpserver.tools.DawnTools;
 import com.dododo.mymcpserver.tools.SQLTools;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,8 +30,8 @@ import java.util.stream.Stream;
 @Configuration
 public class MCPConfig {
    @Bean
-   public ToolCallbackProvider tools(DawnTools dawnTools, SQLTools sqlTools) {
-       return MethodToolCallbackProvider.builder().toolObjects(dawnTools, sqlTools).build();
+   public ToolCallbackProvider tools(DawnTools dawnTools, SQLTools sqlTools, CEMTools cemTools) {
+       return MethodToolCallbackProvider.builder().toolObjects(dawnTools, sqlTools, cemTools).build();
    }
 
 //    @Bean
