@@ -5,6 +5,12 @@ spring:
   application:
     name: my-mcp-server
 
+  shutdown:
+    graceful: true
+
+  lifecycle:
+    timeout-per-shutdown-phase: 3s
+
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -40,4 +46,14 @@ spring:
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
+    io.modelcontextprotocol: DEBUG
+    org.springframework.ai: DEBUG
+    com.dododo.mymcpserver: DEBUG
+# MyBatis-Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.dododo.mymcpserver.model
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
